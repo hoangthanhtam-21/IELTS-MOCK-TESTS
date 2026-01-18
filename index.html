@@ -1,292 +1,529 @@
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IELTS Reading Practice Pro</title>
-    <!-- React & Babel -->
-    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Playfair+Display:wght@700;900&display=swap');
-        body { font-family: 'Inter', sans-serif; }
-        .font-serif { font-family: 'Playfair Display', serif; }
-        .user-highlight { border-radius: 4px; padding: 2px 0; }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #f1f1f1; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-        .passage-content p { margin-bottom: 1.5rem; text-align: justify; line-height: 1.8; }
-    </style>
-</head>
-<body class="bg-white">
-    <div id="root"></div>
+import React, { useState, useEffect, useRef } from 'react';
+import { Timer, Play, CheckCircle, AlertCircle, ChevronLeft, ChevronRight, Highlighter, Info, RotateCcw } from 'lucide-react';
 
-    <script type="text/babel">
-        const { useState, useEffect, useRef } = React;
-
-        // Icons implementation using SVG
-        const TimerIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>;
-        const PlayIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg>;
-        const InfoIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>;
-
-        const PASSAGES_DATA = [
-            {
-                id: 1,
-                title: "How tennis rackets have changed",
-                content: `
-                    <p><span id="s1">In 2016, the British professional tennis player Andy Murray was ranked as the world’s number one.</span> <span id="s3">Yet five years previously, he had been regarded as a talented outsider...</span></p>
-                    <p><span id="s15">They explain how they have adjusted not only racket length, but even experimented with different kinds of paint.</span> <span id="s20">It created a string bed that generated so much topspin that it was quickly banned.</span> <span id="s22">Today it is equal in significance to nutrition or training.</span> <span id="s27">At one time, all tennis rackets were strung with natural gut made from the outer layer of sheep or cow intestines.</span> <span id="s36">Pete Sampras added lead weights onto his rackets.</span> <span id="s40">Gonçalo Oliveira replaced the original grips of his rackets with something thinner.</span></p>
-                `,
-                groups: [
-                    {
-                        instruction: "Do the following statements agree with the information? TRUE, FALSE, or NOT GIVEN.",
-                        questions: [
-                            { id: "q1", type: "choice", text: "People had expected Andy Murray to become the world’s top tennis player for at least five years before 2016.", options: ["TRUE", "FALSE", "NOT GIVEN"], correct: "FALSE", explanation: "Murray was considered a talented outsider 5 years prior.", sourceId: "s3" }
-                        ]
-                    },
-                    {
-                        instruction: "Complete the notes below. Choose ONE WORD ONLY.",
-                        questions: [
-                            { id: "q8", type: "gap", text: "Mike and Bob Bryan made changes to the types of ______ used on their racket frames.", correct: "paint", explanation: "They experimented with different kinds of paint.", sourceId: "s15" },
-                            { id: "q11", type: "gap", text: "All rackets used to have natural strings made from the ______ of animals.", correct: "intestines/gut", explanation: "Made from sheep or cow intestines/gut.", sourceId: "s27" }
-                        ]
-                    }
-                ]
-            },
-            {
-                id: 2,
-                title: "Should we try to bring extinct species back to life?",
-                content: `
-                    <p><span id="s44">Sadly, the passenger pigeon’s existence came to an end on 1 September 1914.</span> <span id="s46">The basic premise involves using cloning technology to turn the DNA...</span> <span id="s53">The return of thylacines to Tasmania could help to ensure that devils are never again subjected to risks.</span> <span id="s58">Beth Shapiro says there is no way to bring back something 100 per cent identical; a hybrid is a more practical approach.</span> <span id="s62">Since the disappearance of this key species, ecosystems in the eastern US have suffered.</span> <span id="s74">Shapiro prefers to focus on how technology could be used to fully understand why various species went extinct.</span> <span id="s75">She says there’s an incredible moral hazard to not do anything at all.</span></p>
-                `,
-                groups: [
-                    {
-                        instruction: "Which paragraph contains the following information? A-F.",
-                        questions: [
-                            { id: "q14", type: "gap", text: "a reference to how further disappearance of multiple species could be avoided: ______", correct: "F", explanation: "Paragraph F discusses preventing mass extinctions.", sourceId: "s74" }
-                        ]
-                    },
-                    {
-                        instruction: "Match each statement with the correct person: Ben Novak, Michael Archer, Beth Shapiro, George Church.",
-                        questions: [
-                            { id: "q23", type: "choice", text: "Reintroducing an extinct species could improve the health of a particular species living there.", options: ["Ben Novak", "Michael Archer", "Beth Shapiro", "George Church"], correct: "Michael Archer", explanation: "Archer mentions thylacines helping Tasmanian devils' health.", sourceId: "s53" },
-                            { id: "q24", type: "choice", text: "It is important to concentrate on the causes of animals becoming extinct.", options: ["Ben Novak", "Michael Archer", "Beth Shapiro", "George Church"], correct: "Beth Shapiro", explanation: "Shapiro wants to understand why species went extinct first.", sourceId: "s74" },
-                            { id: "q25", type: "choice", text: "A more realistic goal is to create an animal similar to an extinct species, rather than an identical copy.", options: ["Ben Novak", "Michael Archer", "Beth Shapiro", "George Church"], correct: "Beth Shapiro", explanation: "Shapiro suggests hybrids are more practical.", sourceId: "s58" },
-                            { id: "q26", type: "choice", text: "There is a moral obligation to take action to try to save some species.", options: ["Ben Novak", "Michael Archer", "Beth Shapiro", "George Church"], correct: "Beth Shapiro", explanation: "Shapiro mentions the 'moral hazard' of doing nothing.", sourceId: "s75" }
-                        ]
-                    }
-                ]
-            },
-            {
-                id: 3,
-                title: "Marketing And Mind Control",
-                content: `
-                    <p><span id="s84">The objective was to promote diamonds as the symbol of everlasting love.</span> <span id="s91">Our olfactory system is targeted by scents aimed at enticing us to linger in a retail outlet.</span> <span id="s93">We are swayed by advertising into paying for bottled water that we can obtain for free.</span> <span id="s103">Potato washing spread from monkey to monkey on the island of Koshima.</span> <span id="s106">Learning by observation helps deal with everyday problems like navigating a subway.</span> <span id="s110">Ads are populated with attractive, successful looking individuals.</span> <span id="s112">A number of studies indicate that some animals also imitate dominant members.</span> <span id="s114">Frans de Waal noted chimpanzees limping like a dominant male.</span> <span id="s117">Imitators copied Dick Fosbury's jumping style, not his brand of shoes.</span> <span id="s120">Stealth marketing involves people paid to covertly promote products.</span></p>
-                `,
-                groups: [
-                    {
-                        instruction: "Choose the correct letter A, B, C or D.",
-                        questions: [
-                            { id: "q27", type: "choice", text: "Which marketing technique attempts to make consumers stay in a shop for longer?", options: ["A. playing music", "B. emitting pleasant scents", "C. posters", "D. announcements"], correct: "B. emitting pleasant scents", explanation: "Olfactory system is targeted to make us linger.", sourceId: "s91" }
-                        ]
-                    },
-                    {
-                        instruction: "Match the sentence endings A-G.",
-                        questions: [
-                            { id: "q37", type: "choice", text: "The behaviour of the monkeys on the island of Koshima showed that", options: ["A. imitated success", "C. imitated high status", "E. unaware consumers", "F. animals develop new habits by observation"], correct: "F. animals develop new habits by observation", explanation: "Observation led to potato washing habit.", sourceId: "s103" },
-                            { id: "q38", type: "choice", text: "Primatologist Frans de Waal found that", options: ["A. imitated success", "C. an animal would imitate another that had higher status.", "E. unaware consumers", "F. habits by observation"], correct: "C. an animal would imitate another that had higher status.", explanation: "Chimps imitated the dominant male.", sourceId: "s114" },
-                            { id: "q39", type: "choice", text: "Dick Fosbury is mentioned in order to show that", options: ["A. people imitated behaviour that was linked with success.", "C. imitated high status", "E. unaware consumers", "F. habits by observation"], correct: "A. people imitated behaviour that was linked with success.", explanation: "Copying style (success) vs shoes (product).", sourceId: "s117" },
-                            { id: "q40", type: "choice", text: "A feature of some modern marketing campaigns is that", options: ["A. imitated success", "C. imitated high status", "E. products are marketed to consumers unaware it is occurring", "F. habits by observation"], correct: "E. products are marketed to consumers unaware it is occurring", explanation: "Stealth marketing is covert.", sourceId: "s120" }
-                        ]
-                    }
-                ]
+// --- CẤU TRÚC DỮ LIỆU ---
+const PASSAGES_DATA = [
+  {
+    id: 1,
+    title: "How tennis rackets have changed",
+    content: `
+      <p><span id="s1">In 2016, the British professional tennis player Andy Murray was ranked as the world’s number one.</span> <span id="s2">It was an incredible achievement by any standard – made even more remarkable by the fact that he did this during a period considered to be one of the strongest in the sport’s history, competing against the likes of Rafael Nadal, Roger Federer and Novak Djokovic, to name just a few.</span> <span id="s3">Yet five years previously, he had been regarded as a talented outsider who entered but never won the major tournaments.</span></p>
+      <p><span id="s4">Of the changes that account for this transformation, one was visible and widely publicised: in 2011, Murray invited former number one player Ivan Lendl onto his coaching team – a valuable addition that had a visible impact on the player’s playing style.</span> <span id="s5">Another change was so subtle as to pass more or less unnoticed.</span> <span id="s6">Like many players, Murray has long preferred a racket that consists of two types of string: one for the mains (verticals) and another for the crosses (horizontals).</span> <span id="s7">While he continued to use natural string in the crosses, in 2012 he switched to a synthetic string for the mains.</span> <span id="s8">A small change, perhaps, but its importance should not be underestimated.</span></p>
+      <p><span id="s9">The modification that Murray made is just one of a number of options available to players looking to tweak their rackets in order to improve their games.</span> <span id="s10">‘Touring professionals have their rackets customised to their specific needs,’ says Colin Triplow, a UK-based professional racket stringer.</span> <span id="s11">‘It’s a highly important part of performance maximisation.’</span> <span id="s12">Consequently, the specific rackets used by the world’s elite are not actually readily available to the public; rather, each racket is individually made to suit the player who uses it.</span> <span id="s13">Take the US professional tennis players Mike and Bob Bryan, for example: ‘We’re very particular with our racket specifications,’ they say.</span> <span id="s14">‘All our rackets are sent from our manufacturer to Tampa, Florida, where our frames go through a … thorough customisation process.’</span> <span id="s15">They explain how they have adjusted not only racket length, but even experimented with different kinds of paint.</span> <span id="s16">The rackets they use now weigh more than the average model and also have a denser string pattern (i.e. more crosses and mains).</span></p>
+      <p><span id="s17">The primary reason for these modifications is simple: as the line between winning and losing becomes thinner and thinner, even these slight changes become more and more important.</span> <span id="s18">As a result, players and their teams are becoming increasingly creative with the modifications to their rackets as they look to maximise their competitive advantage.</span></p>
+      <p><span id="s19">Racket modifications mainly date back to the 1970s, when the amateur German tennis player Werner Fischer started playing with the so-called spaghetti-strung racket.</span> <span id="s20">It created a string bed that generated so much topspin that it was quickly banned by the International Federation.</span> <span id="s21">However, within a decade or two, racket modification became a regularity.</span> <span id="s22">Today it is, in many ways, an aspect of the game that is equal in significance to nutrition or training.</span></p>
+      <p><span id="s23">Modifications can be divided into two categories: those to the string bed and those to the racket frame.</span> <span id="s24">The former is far more common than the latter: the choice of the strings and the tension with which they are installed is something that nearly all professional players experiment with.</span> <span id="s25">They will continually change it depending on various factors including the court surface, climatic conditions, and game styles.</span> <span id="s26">Some will even change it depending on how they feel at the time.</span></p>
+      <p><span id="s27">At one time, all tennis rackets were strung with natural gut made from the outer layer of sheep or cow intestines.</span> <span id="s28">This all changed in the early 1990s with the development of synthetic strings that were cheaper and more durable.</span> <span id="s29">They are made from three materials: nylon (relatively durable and affordable), Kevlar (too stiff to be used alone) or co-polyester (polyester combined with additives that enhance its performance).</span> <span id="s30">Even so, many professional players continue to use a ‘hybrid set-up’, where a combination of both synthetic and natural strings are used.</span></p>
+      <p><span id="s31">Of the synthetics, co-polyester is by far the most widely used.</span> <span id="s32">It’s a perfect fit for the style of tennis now played, where players tend to battle it out from the back of the court rather than coming to the net.</span> <span id="s33">Studies indicate that the average spin from a co-polyester string is 25% greater than that from natural string or other synthetics.</span> <span id="s34">In a sense, the development of co-polyester strings has revolutionised the game.</span></p>
+      <p><span id="s35">However, many players go beyond these basic adjustments to the strings and make changes to the racket frame itself.</span> <span id="s36">For example, much of the serving power of US professional player Pete Sampras was attributed to the addition of four to five lead weights onto his rackets, and today many professionals have the weight adjusted during the manufacturing process.</span></p>
+      <p><span id="s37">Other changes to the frame involve the handle.</span> <span id="s38">Players have individual preferences for the shape of the handle and some will have the handle of one racket moulded onto the frame of a different racket.</span> <span id="s39">Other players make different changes.</span> <span id="s40">The professional Portuguese player Gonçalo Oliveira replaced the original grips of his rackets with something thinner because they had previously felt uncomfortable to hold.</span></p>
+      <p><span id="s41">Racket customisation and modification have pushed the standards of the game to greater levels that few could have anticipated in the days of natural strings and heavy, wooden frames, and it’s exciting to see what further developments there will be in the future.</span></p>
+    `,
+    groups: [
+      {
+        instruction: "Do the following statements agree with the information given in Reading Passage 1? Write TRUE, FALSE, or NOT GIVEN.",
+        questions: [
+          { id: "q1", type: "choice", text: "People had expected Andy Murray to become the world’s top tennis player for at least five years before 2016.", options: ["TRUE", "FALSE", "NOT GIVEN"], correct: "FALSE", explanation: "Murray was considered a talented outsider, not a future #1.", sourceId: "s3" },
+          { id: "q2", type: "choice", text: "The change that Andy Murray made to his rackets attracted a lot of attention.", options: ["TRUE", "FALSE", "NOT GIVEN"], correct: "FALSE", explanation: "The change was 'so subtle as to pass more or less unnoticed'.", sourceId: "s5" },
+          { id: "q3", type: "choice", text: "Most of the world’s top players take a professional racket stringer on tour with them.", options: ["TRUE", "FALSE", "NOT GIVEN"], correct: "NOT GIVEN", explanation: "Text mentions professional stringers but not their touring habits.", sourceId: "s10" },
+          { id: "q4", type: "choice", text: "Mike and Bob Bryan use rackets that are light in comparison to the majority of rackets.", options: ["TRUE", "FALSE", "NOT GIVEN"], correct: "FALSE", explanation: "Their rackets 'weigh more than the average model'.", sourceId: "s16" },
+          { id: "q5", type: "choice", text: "Werner Fischer played with a spaghetti-strung racket that he designed himself.", options: ["TRUE", "FALSE", "NOT GIVEN"], correct: "NOT GIVEN", explanation: "Text confirms he used it, but doesn't mention who designed it.", sourceId: "s19" },
+          { id: "q6", type: "choice", text: "The weather can affect how professional players adjust the strings on their rackets.", options: ["TRUE", "FALSE", "NOT GIVEN"], correct: "TRUE", explanation: "Adjustments are made depending on 'climatic conditions'.", sourceId: "s25" },
+          { id: "q7", type: "choice", text: "It was believed that the change Pete Sampras made to his rackets contributed to his strong serve.", options: ["TRUE", "FALSE", "NOT GIVEN"], correct: "TRUE", explanation: "Serving power was 'attributed to the addition of four to five lead weights'.", sourceId: "s36" }
+        ]
+      },
+      {
+        instruction: "Complete the notes below. Choose ONE WORD ONLY from the passage for each answer.",
+        questions: [
+          { id: "q8", type: "gap", text: "Mike and Bob Bryan made changes to the types of ______ used on their racket frames.", correct: "paint", explanation: "Họ đã thử nghiệm với nhiều loại nước sơn (different kinds of paint) trên khung vợt.", sourceId: "s15" },
+          { id: "q9", type: "gap", text: "Players were not allowed to use the spaghetti-strung racket because of the amount of ______ it created.", correct: "topspin", explanation: "Vợt dây spaghetti tạo ra quá nhiều lực xoáy (topspin) nên đã bị cấm.", sourceId: "s20" },
+          { id: "q10", type: "gap", text: "Changes to rackets can be regarded as being as important as players’ diets or the ______ they do.", correct: "training", explanation: "Tầm quan trọng tương đương dinh dưỡng hoặc luyện tập (training).", sourceId: "s22" },
+          { id: "q11", type: "gap", text: "All rackets used to have natural strings made from the ______ of animals.", correct: "intestines/gut", explanation: "Làm từ lớp ngoài của ruột (intestines/gut) động vật.", sourceId: "s27" },
+          { id: "q12", type: "gap", text: "Pete Sampras had metal ______ put into the frames of his rackets.", correct: "weights", explanation: "Pete Sampras đã bổ sung các quả nặng (weights) bằng chì.", sourceId: "s36" },
+          { id: "q13", type: "gap", text: "Gongalo Oliveira changed the ______ on his racket handles.", correct: "grips", explanation: "Oliveira đã thay thế dây quấn cán vợt (grips) nguyên bản.", sourceId: "s40" }
+        ]
+      }
+    ]
+  },
+  {
+    id: 2,
+    title: "Should we try to bring extinct species back to life?",
+    content: `
+      <p><strong>A.</strong> <span id="s42">The passenger pigeon was a legendary species.</span> <span id="s43">Flying in vast numbers across North America, with potentially many millions within a single flock, their migration was once one of nature’s great spectacles.</span> <span id="s44">Sadly, the passenger pigeon’s existence came to an end on 1 September 1914, when the last living specimen died at Cincinnati Zoo.</span> <span id="s45">Geneticist Ben Novak is lead researcher on an ambitious project which now aims to bring the bird back to life through a process known as ‘de-extinction’.</span> <span id="s46">The basic premise involves using cloning technology to turn the DNA of extinct animals into a fertilised embryo, which is carried by the nearest relative still in existence — in this case, the abundant band-tailed pigeon — before being born as a living, breathing animal.</span> <span id="s47">Passenger pigeons are one of the pioneering species in this field, but they are far from the only ones on which this cutting-edge technology is being trialled.</span></p>
+      <p><strong>B.</strong> <span id="s48">In Australia, the thylacine, more commonly known as the Tasmanian tiger, is another extinct creature which genetic scientists are striving to bring back to life.</span> <span id="s49">‘There is no carnivore now in Tasmania that fills the niche which thylacines once occupied,’ explains Michael Archer of the University of New South Wales.</span> <span id="s50">He points out that in the decades since the thylacine went extinct, there has been a spread in a ‘dangerously debilitating’ facial tumour syndrome which threatens the existence of the Tasmanian devils, the island’s other notorious resident.</span> <span id="s51">Thylacines would have prevented this spread because they would have killed significant numbers of Tasmanian devils.</span> <span id="s52">‘If that contagious cancer had popped up previously, it would have burned out in whatever region it started.’</span> <span id="s53">The return of thylacines to Tasmania could help to ensure that devils are never again subjected to risks of this kind.</span></p>
+      <p><strong>C.</strong> <span id="s54">If extinct species can be brought back to life, can humanity begin to correct the damage it has caused to the natural world over the past few millennia?</span> <span id="s55">‘The idea of de-extinction is that we can reverse this process, bringing species that no longer exist back to life,’ says Beth Shapiro of University of California Santa Cruz's Genomics Institute.</span> <span id="s56">‘I don’t think that we can do this.</span> <span id="s57">There is no way to bring back something that is 100 per cent identical to a species that went extinct a long time ago.’</span> <span id="s58">A more practical approach for long-extinct species is to take the DNA of existing species as a template, ready for the insertion of strands of extinct animal DNA to create something new; a hybrid, based on the living species, but which looks and/or acts like the animal which died out.</span></p>
+      <p><strong>D.</strong> <span id="s59">This complicated process and questionable outcome begs the question: what is the actual point of this technology?</span> <span id="s60">‘For us, the goal has always been replacing the extinct species with a suitable replacement,’ explains Novak.</span> <span id="s61">‘When it comes to breeding, band-tailed pigeons scatter and make maybe one or two nesis per hectare, whereas passenger pigeons were very social and would make 10,000 or more nests in one hectare.’</span> <span id="s61a">Since the disappearance of this key species, ecosystems in the eastern US have suffered, as the lack of disturbance caused by thousands of passenger pigeons wrecking trees and branches means there has been minimal need for regrowth.</span> <span id="s62">This has left forests stagnant and vì vậy unwelcoming to the plants and animals which evolved to help regenerate the forest after a disturbance.</span> <span id="s63">According to Novak, a hybridised band-tailed pigeon, with the added nesting habits of a passenger pigeon, could, in theory, re-establish that forest disturbance, thereby creating a habitat necessary for a great many other native species to thrive.</span></p>
+      <p><strong>E.</strong> <span id="s65">Another popular candidate for this technology is the woolly mammoth.</span> <span id="s66">George Church, professor at Harvard Medical School and leader of the Woolly Mammoth Revival Project, has been focusing on cold resistance, the main way in which the extinct woolly mammoth and its nearest living relative, the Asian elephant, differ.</span> <span id="s67">By pinpointing which genetic traits made it possible for mammoths to survive the icy climate of the tundra, the project's goal is to return mammoths, or a mammoth-like species, to the area.</span> <span id="s68">‘My highest priority would be preserving the endangered Asian elephant,’ says Church, ‘expanding their range to the huge ecosystem of the tundra.</span> <span id="s69">Necessary adaptations would include smaller ears, thicker hair, and extra insulating fat, all for the purpose of reducing heat loss in the tundra, and all traits found in the now extinct woolly mammoth.’</span> <span id="s70">This repopulation of the tundra and boreal forests of Eurasia and North America with large mammals could also be a useful factor in reducing carbon emissions — elephants punch holes through snow and knock down trees, which encourages grass growth.</span> <span id="s71">This grass growth would reduce temperatures, and mitigate emissions from melting permafrost.</span></p>
+      <p><strong>F.</strong> <span id="s72">While the prospect of bringing extinct animals back to life might capture imaginations, it is, of course, far easier to try to save an existing species which is merely threatened with extinction.</span> <span id="s73">‘Many of the technologies that people have in mind when they think about de-extinction can be used as a form of “genetic rescue”,’ explains Shapiro.</span> <span id="s74">She prefers to focus the debate on how this emerging technology could be used to fully understand why various species went extinct in the first place, and therefore how we could use it to make genetic modifications which could prevent mass extinctions in the future.</span> <span id="s75">‘I would also say there’s an incredible moral hazard to not do anything at all,’ she continues.</span> <span id="s76">‘We know that what we are doing today is not enough, and we have to be willing to take some calculated and measured risks.’</span></p>
+    `,
+    groups: [
+      {
+        instruction: "Which paragraph contains the following information? Write the correct letter, A-F.",
+        questions: [
+          { id: "q14", type: "gap", text: "a reference to how further disappearance of multiple species could be avoided: ______", correct: "F", explanation: "Đoạn F: Sử dụng công nghệ để ngăn chặn các đợt tuyệt chủng hàng loạt trong tương lai.", sourceId: "s74" },
+          { id: "q15", type: "gap", text: "explanation of a way of reproducing an extinct animal using the DNA of only that species: ______", correct: "A", explanation: "Đoạn A giải thích quy trình nhân bản sử dụng ADN của chính động vật đã tuyệt chủng.", sourceId: "s46" },
+          { id: "q16", type: "gap", text: "reference to a habitat which has suffered following the extinction of a species: ______", correct: "D", explanation: "Đoạn D mô tả hệ sinh thái ở miền đông Hoa Kỳ chịu thiệt hại sau khi bồ câu viễn khách biến mất.", sourceId: "s62" },
+          { id: "q17", type: "gap", text: "mention of the exact point at which a particular species became extinct: ______", correct: "A", explanation: "Đoạn A ghi rõ ngày bồ câu viễn khách tuyệt chủng là ngày 1 tháng 9 năm 1914.", sourceId: "s44" }
+        ]
+      },
+      {
+        instruction: "Complete the summary below. Choose NO MORE THAN TWO WORDS from the passage for each answer.",
+        questions: [
+          { 
+            id: "summary-p2", 
+            type: "paragraph-gap", 
+            text: "The woolly mammoth revival project\n\nProfessor George Church and his team are trying to identify the (18) [q18] which enabled mammoths to live in the tundra. The findings could help preserve the mammoth's close relative, the endangered Asian elephant. According to Church, introducing Asian elephants to the tundra would involve certain physical adaptations to minimize (19) [q19]. To survive in the tundra, the species would need to have the mammoth-like features of thicker hair, (20) [q20] of a reduced size and more (21) [q21]. Repopulating the tundra with mammoths or Asian elephant/mammoth hybrids would also have an impact on the environment, which could help to reduce temperatures and decrease (22) [q22].",
+            gaps: {
+              "q18": { correct: "genetic traits", explanation: "Đoạn E: Church tập trung xác định đặc tính di truyền giúp mammoth sống trong tundra.", sourceId: "s67" },
+              "q19": { correct: "heat loss", explanation: "Đoạn E: Thích nghi vật lý nhằm mục đích giảm mất nhiệt.", sourceId: "s69" },
+              "q20": { correct: "ears", explanation: "Đoạn E: Tai nhỏ hơn để giảm thoát nhiệt.", sourceId: "s69" },
+              "q21": { correct: "insulating fat", explanation: "Đoạn E: Cần thêm lớp mỡ cách nhiệt.", sourceId: "s69" },
+              "q22": { correct: "emissions", explanation: "Đoạn E: Giúp giảm khí thải từ lớp băng vĩnh cửu tan chảy.", sourceId: "s71" }
             }
-        ];
+          }
+        ]
+      },
+      {
+        instruction: "Look at the following statements and the list of people below. Match each statement with the correct person, A, B, C or D.",
+        questions: [
+          { 
+            id: "q23", type: "choice", text: "23. Reintroducing an extinct species to its original habitat could improve the health of a particular species living there.", 
+            options: ["A. Ben Novak", "B. Michael Archer", "C. Beth Shapiro", "D. George Church"], 
+            correct: "B. Michael Archer", 
+            explanation: "Michael Archer tin rằng việc đưa Thylacine trở lại sẽ giúp ngăn chặn sự lây lan của ung thư mặt ở Quỷ Tasmania.", 
+            sourceId: "s53" 
+          },
+          { 
+            id: "q24", type: "choice", text: "24. It is important to concentrate on the causes of animals becoming extinct.", 
+            options: ["A. Ben Novak", "B. Michael Archer", "C. Beth Shapiro", "D. George Church"], 
+            correct: "C. Beth Shapiro", 
+            explanation: "Beth Shapiro muốn tập trung vào việc hiểu tại sao các loài tuyệt chủng ngay từ đầu.", 
+            sourceId: "s74" 
+          },
+          { 
+            id: "q25", type: "choice", text: "25. A more realistic goal is to create an animal that is similar to an extinct species, rather than an identical copy.", 
+            options: ["A. Ben Novak", "B. Michael Archer", "C. Beth Shapiro", "D. George Church"], 
+            correct: "C. Beth Shapiro", 
+            explanation: "Bà cho rằng không thể tạo ra bản sao 100% mà nên tạo ra một loài lai có đặc điểm tương tự.", 
+            sourceId: "s58" 
+          },
+          { 
+            id: "q26", type: "choice", text: "26. There is a moral obligation to take action to try to save some species.", 
+            options: ["A. Ben Novak", "B. Michael Archer", "C. Beth Shapiro", "D. George Church"], 
+            correct: "C. Beth Shapiro", 
+            explanation: "Shapiro tuyên bố rằng có một mối nguy hiểm đạo đức (moral hazard) nếu chúng ta không làm gì cả.", 
+            sourceId: "s75" 
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: 3,
+    title: "Marketing And Mind Control",
+    content: `
+      <p><span id="s78">While there had been a long tradition of giving rings as a commitment to marry, the custom of giving diamond engagement rings was in large part manufactured by one of the most effective marketing campaigns in history.</span> <span id="s79">In the early 1900s, diamond sales were declining, posing a serious problem for the company that essentially had control over the diamond market.</span> <span id="s80">In 1938, this company hired an advertising agency which proposed reshaping social attitudes toward diamonds.</span> <span id="s81">As well as magazines showing film stars draped in diamonds, the agency arranged for movies to incorporate diamond engagement rings into their plots.</span> <span id="s82">The campaign culminated with the slogan: 'A diamond is forever.'</span> <span id="s83">At the time, the approach was unique.</span> <span id="s84">Rather than pushing a brand, the objective was to promote diamonds as the symbol of everlasting love.</span> <span id="s85">This was achieved by exploiting the associative nature of the brain: associating neurons activated by the concept of 'love' with neurons that encoded the concept of 'diamonds'.</span> <span id="s86">By 1941, diamond sales had increased by 55%.</span></p>
+      
+      <p><span id="s87">Advertising comes in many forms, from blatant neon signs to subtly embedded products in movies.</span> <span id="s88">In each case, the goal is to mould our habits, desires and opinions.</span> <span id="s89">Our visual system is targeted by an avalanche of information on the internet, street posters, and billboards and in movie theatres.</span> <span id="s90">Our auditory system submits to catchy radio jingles and telemarketers.</span> <span id="s91">More surreptitiously, our olfactory system is targeted by variations of vanilla and citrus perfumes aimed at enticing us to linger in a retail outlet.</span> <span id="s92">It is difficult to measure how effective these campaigns are, but they can be so successful that they change the fabric of our culture.</span> <span id="s93">In the case of bottled water, we are swayed by advertising into paying for something that we can obtain for free.</span> <span id="s94">Most people cannot distinguish bottled from tap water, which is why you rarely hear of a bottled water company proposing a blind taste test.</span></p>
+      
+      <p><span id="s95">So why is marketing such an effective mind-control technique?</span> <span id="s96">It is interesting to consider whether other animals exhibit anything analogous to humans' susceptibility to advertising.</span> <span id="s97">If we provide a lab rat with two types of cereal, it will consume approximately the same amount of each.</span> <span id="s98">However, if we put that rat with another rat that spent its day eating just one type, our rat will now show a preference for the same type as the other rat was eating.</span> <span id="s99">Psychologists call this 'socially transmitted food preference'.</span></p>
+      
+      <p><span id="s100">What many regard as the first documented examples of cultural learning in primates started with a clever monkey that lived in a colony of Japanese monkeys on the island of Koshima.</span> <span id="s101">She began taking her dirt-covered sweet potatoes to the river to wash them before eating them.</span> <span id="s102">Upon seeing this, a few other open-minded monkeys picked up on the idea.</span> <span id="s103">Potato washing then spread from monkey to monkey and, over the course of a few years, most monkeys were eating clean potatoes.</span> <span id="s104">Humans are clearly not the only animals to engage in imitation and social learning.</span></p>
+      
+      <p><span id="s105">Learning by observation can be an extraordinarily valuable brain feature.</span> <span id="s106">This is how we learn to communicate and perform motor skills as well as deal with many everyday problems.</span> <span id="s107">For example, a newcomer struggling to purchase tickets and navigate the subway system in a foreign city may step back to learn from the people nearby.</span> <span id="s108">Humans and other primates exhibit multiple forms of imitative learning, and this is called cultural transmission.</span></p>
+      
+      <p><span id="s109">A component of advertising relies on the marketer's ability to tap into the brain’s propensity for imitation.</span> <span id="s110">Anybody who has watched TV knows advertisements are disproportionately populated with attractive, successful looking individuals.</span> <span id="s111">If we are going to imitate someone, we are more inclined to imitate those who appear to be popular and appealing.</span></p>
+      
+      <p><span id="s112">Although not all researchers are convinced by the findings, a number of studies indicate that some animals also imitate dominant members of their group.</span> <span id="s113">Primatologist Frans de Waal provides anecdotal evidence of preferential imitation among chimpanzees.</span> <span id="s114">He noted that in one particular group the dominant male was hurt and was limping as a result.</span> <span id="s115">Soon other chimpanzees were also limping.</span></p>
+      
+      <p><span id="s116">Imitation is undoubtedly an invaluable ability, but often our propensity to imitate generalises indiscriminately, leading to poor decisions.</span> <span id="s117">When athlete Dick Fosbury revolutionised the high jump by jumping over the bar backward in 1968, imitators obviously copied his jumping style, not his brand of sports shoes.</span> <span id="s118">However, today, sports people appear in advertisements asking us to buy the laptops or sports drinks that they promote.</span> <span id="s119">Rationally, we know these people's success did not depend on these products, so it seems our propensity to purchase products relates more to neural programs that evolved to encourage imitation of those further up the social ladder.</span> <span id="s120">Today, companies engage in stealth marketing campaigns in which people are paid to frequent bars or websites to covertly promote certain products.</span></p>
+    `,
+    groups: [
+      {
+        instruction: "Choose the correct letter, A, B, C or D. Write the correct letter in boxes 27-31 on your answer sheet.",
+        questions: [
+          { id: "q27", type: "choice", text: "According to the writer, which marketing technique attempts to make consumers stay in a shop for longer?", options: ["A playing appealing music", "B emitting pleasant scents", "C displaying attractive posters", "D making in-store announcements"], correct: "B emitting pleasant scents", explanation: "Hệ thống khứu giác bị nhắm mục tiêu bởi nước hoa vani và cam quýt nhằm dụ dỗ chúng ta nán lại (linger) cửa hàng lâu hơn.", sourceId: "s91" },
+          { id: "q28", type: "choice", text: "The writer mentions bottled water in order to show that", options: ["A consumers buy it because of the fact that it is marketed.", "B people purchase it despite the fact that it has no taste.", "C marketers need not do taste tests when a campaign is effective.", "D tests prove that people cannot differentiate it from tap water."], correct: "A consumers buy it because of the fact that it is marketed.", explanation: "Ví dụ nước đóng chai minh họa sức mạnh của quảng cáo: khiến chúng ta trả tiền cho thứ có thể lấy miễn phí.", sourceId: "s93" },
+          { id: "q29", type: "choice", text: "According to the writer, socially transmitted food preference occurs when", options: ["A only dominant members of an animal group influence what others eat.", "B the same types of animals naturally prefer the same types of food.", "C animals are influenced by what any other animals of the same species eat.", "D a food type is more desirable because an animal views that food as scarce."], correct: "C animals are influenced by what any other animals of the same species eat.", explanation: "Khi một con chuột thấy con chuột khác ăn một loại ngũ cốc, nó sẽ có xu hướng thích loại đó hơn.", sourceId: "s98" },
+          { id: "q30", type: "choice", text: "According to the writer, how is learning by observation and imitation a useful feature of the brain?", options: ["A it helps people overcome challenges.", "B positive models can influence social behaviour.", "C it can give an advantage when communicating with others.", "D cultural norms and relationships can be understood more easily"], correct: "A it helps people overcome challenges.", explanation: "Giúp đối phó với nhiều vấn đề hàng ngày, ví dụ như một người mới đến đang chật vật mua vé tàu điện ngầm.", sourceId: "s106" },
+          { id: "q31", type: "choice", text: "According to the writer, how does television advertising exploit the human tendency to imitate others?", options: ["A It shows buying behaviour that marketers want to encourage in viewers.", "B It features people who have a desirable image.", "C It shows older people whom teenagers admire.", "D It features successful people endorsing products responsible for their success."], correct: "B It features people who have a desirable image.", explanation: "Quảng cáo xuất hiện dày đặc những cá nhân trông hấp dẫn, thành công vì con người có xu hướng bắt chước họ.", sourceId: "s110" }
+        ]
+      },
+      {
+        instruction: "Do the following statements agree with the claims of the writer? Write YES, NO, or NOT GIVEN in boxes 32-36.",
+        questions: [
+          { id: "q32", type: "choice", text: "The diamond campaign worked by making a connection in people's minds between diamonds and luxury.", options: ["YES", "NO", "NOT GIVEN"], correct: "NO", explanation: "Mục tiêu là quảng bá kim cương như biểu tượng của 'tình yêu vĩnh cửu', không phải 'sự xa hoa'.", sourceId: "s84" },
+          { id: "q33", type: "choice", text: "People are more aware of visual marketing than auditory marketing.", options: ["YES", "NO", "NOT GIVEN"], correct: "NOT GIVEN", explanation: "Tác giả liệt kê cả hai nhưng không so sánh mức độ nhận thức của con người đối với hai loại này.", sourceId: "s89" },
+          { id: "q34", type: "choice", text: "The campaign advertising diamonds had a positive influence on society.", options: ["YES", "NO", "NOT GIVEN"], correct: "NOT GIVEN", explanation: "Bài đọc nói nó thay đổi văn hóa nhưng không đánh giá đó là ảnh hưởng tích cực hay tiêu cực.", sourceId: "s92" },
+          { id: "q35", type: "choice", text: "There is still some uncertainty about whether animals copy the behaviour of the most powerful animals among them.", options: ["YES", "NO", "NOT GIVEN"], correct: "YES", explanation: "Tác giả nói 'không phải tất cả các nhà nghiên cứu đều bị thuyết phục', nghĩa là vẫn còn sự không chắc chắn.", sourceId: "s112" },
+          { id: "q36", type: "choice", text: "Consumers make a logical connection between celebrities' achievements and the products they promote.", options: ["YES", "NO", "NOT GIVEN"], correct: "NO", explanation: "Về mặt lý trí, chúng ta biết thành công của họ không phụ thuộc vào sản phẩm; việc mua hàng dựa trên bản năng bắt chước.", sourceId: "s119" }
+        ]
+      },
+      {
+        instruction: "Complete each sentence with the correct ending, A - G, below.",
+        questions: [
+          { 
+            id: "q37", type: "choice", text: "37. The behaviour of the monkeys on the island of Koshima showed that", 
+            options: [
+              "A. people imitated behaviour that was linked with success.", 
+              "B. younger animals are more likely to imitate each other.", 
+              "C. an animal would imitate another that had higher status.", 
+              "D. imitation of sportspeople has occurred for many decades.", 
+              "E. products are marketed to consumers who are unaware.", 
+              "F. animals can develop new habits by observation.", 
+              "G. incentives are provided for consumers."
+            ], 
+            correct: "F. animals can develop new habits by observation.", 
+            explanation: "Những con khỉ học cách rửa khoai lang bằng cách quan sát lẫn nhau.", 
+            sourceId: "s103" 
+          },
+          { 
+            id: "q38", type: "choice", text: "38. Primatologist Frans de Waal found that", 
+            options: [
+              "A. people imitated behaviour that was linked with success.", 
+              "B. younger animals are more likely to imitate each other.", 
+              "C. an animal would imitate another that had higher status.", 
+              "D. imitation of sportspeople has occurred for many decades.", 
+              "E. products are marketed to consumers who are unaware.", 
+              "F. animals can develop new habits by observation.", 
+              "G. incentives are provided for consumers."
+            ], 
+            correct: "C. an animal would imitate another that had higher status.", 
+            explanation: "Tinh tinh bắt chước dáng đi khập khiễng của con đực đầu đàn (con có địa vị cao).", 
+            sourceId: "s114" 
+          },
+          { 
+            id: "q39", type: "choice", text: "39. Dick Fosbury is mentioned in order to show that", 
+            options: [
+              "A. people imitated behaviour that was linked with success.", 
+              "B. younger animals are more likely to imitate each other.", 
+              "C. an animal would imitate another that had higher status.", 
+              "D. imitation of sportspeople has occurred for many decades.", 
+              "E. products are marketed to consumers who are unaware.", 
+              "F. animals can develop new habits by observation.", 
+              "G. incentives are provided for consumers."
+            ], 
+            correct: "A. people imitated behaviour that was linked with success.", 
+            explanation: "Mọi người bắt chước kiểu nhảy (hành vi thành công) chứ không phải nhãn hiệu giày.", 
+            sourceId: "s117" 
+          },
+          { 
+            id: "q40", type: "choice", text: "40. A feature of some modern marketing campaigns is that", 
+            options: [
+              "A. people imitated behaviour that was linked with success.", 
+              "B. younger animals are more likely to imitate each other.", 
+              "C. an animal would imitate another that had higher status.", 
+              "D. imitation of sportspeople has occurred for many decades.", 
+              "E. products are marketed to potential consumers who are unaware that marketing is occurring.", 
+              "F. animals can develop new habits by observation.", 
+              "G. incentives are provided for consumers."
+            ], 
+            correct: "E. products are marketed to potential consumers who are unaware that marketing is occurring.", 
+            explanation: "Tiếp thị lén lút (stealth marketing) quảng bá sản phẩm một cách bí mật.", 
+            sourceId: "s120" 
+          }
+        ]
+      }
+    ]
+  }
+];
 
-        function App() {
-            const [status, setStatus] = useState('idle');
-            const [currentPassage, setCurrentPassage] = useState(0);
-            const [answers, setAnswers] = useState({});
-            const [timeLeft, setTimeLeft] = useState(3600);
-            const [reviewId, setReviewId] = useState(null);
+const calculateBandScore = (correctCount) => {
+  if (correctCount >= 39) return 9.0;
+  if (correctCount >= 37) return 8.5;
+  if (correctCount >= 35) return 8.0;
+  if (correctCount >= 33) return 7.5;
+  if (correctCount >= 30) return 7.0;
+  if (correctCount >= 27) return 6.5;
+  if (correctCount >= 23) return 6.0;
+  if (correctCount >= 19) return 5.5;
+  if (correctCount >= 15) return 5.0;
+  if (correctCount >= 13) return 4.5;
+  if (correctCount >= 10) return 4.0;
+  return 3.5;
+};
 
-            useEffect(() => {
-                let timer;
-                if (status === 'testing' && timeLeft > 0) {
-                    timer = setInterval(() => setTimeLeft(prev => prev - 1), 1000);
-                }
-                return () => clearInterval(timer);
-            }, [status, timeLeft]);
+const App = () => {
+  const [testStatus, setTestStatus] = useState('idle');
+  const [timeLeft, setTimeLeft] = useState(3600);
+  const [currentPassageIdx, setCurrentPassageIdx] = useState(0);
+  const [userAnswers, setUserAnswers] = useState({});
+  const [reviewFocusId, setReviewFocusId] = useState(null);
+  const timerRef = useRef(null);
 
-            const formatTime = (s) => {
-                const m = Math.floor(s / 60);
-                const rs = s % 60;
-                return `${m}:${rs.toString().padStart(2, '0')}`;
-            };
+  useEffect(() => {
+    if (testStatus === 'testing' && timeLeft > 0) {
+      timerRef.current = setInterval(() => setTimeLeft(prev => prev - 1), 1000);
+    } else if (timeLeft === 0 && testStatus === 'testing') {
+      finishTest();
+    }
+    return () => clearInterval(timerRef.current);
+  }, [testStatus, timeLeft]);
 
-            const checkAns = (u, c) => {
-                if (!u) return false;
-                const user = u.trim().toLowerCase();
-                const correct = c.trim().toLowerCase();
-                if (correct.includes('/')) return correct.split('/').some(part => part.trim() === user);
-                if (user.length === 1 && correct.startsWith(user)) return true;
-                return user === correct;
-            };
+  const startTest = () => { setTestStatus('testing'); setTimeLeft(3600); setUserAnswers({}); setReviewFocusId(null); };
+  const finishTest = () => { setTestStatus('finished'); clearInterval(timerRef.current); };
 
-            const calculateScore = () => {
-                let score = 0;
-                PASSAGES_DATA.forEach(p => p.groups.forEach(g => g.questions.forEach(q => {
-                    if (checkAns(answers[q.id], q.correct)) score++;
-                })));
-                return score;
-            };
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
 
-            if (status === 'idle') {
-                return (
-                    <div className="min-h-screen flex items-center justify-center bg-slate-50">
-                        <div className="bg-white p-12 rounded-[2.5rem] shadow-2xl border border-slate-100 text-center max-w-md w-full">
-                            <div className="w-20 h-20 bg-blue-600 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-lg shadow-blue-200">
-                                <TimerIcon />
+  const checkIndividualAnswer = (uAns, cAns) => {
+    const u = (uAns || "").trim().toLowerCase();
+    const c = (cAns || "").trim().toLowerCase();
+    if (c.includes('/')) return c.split('/').map(a => a.trim()).includes(u);
+    if (u.length === 1 && c.startsWith(u.toUpperCase() + " ")) return true;
+    return u === c;
+  };
+
+  const getCorrectCount = () => {
+    let count = 0;
+    PASSAGES_DATA.forEach(p => {
+      p.groups?.forEach(g => {
+        g.questions.forEach(q => {
+          if (q.type === 'paragraph-gap') {
+            Object.keys(q.gaps).forEach(gapId => {
+              if (checkIndividualAnswer(userAnswers[gapId], q.gaps[gapId].correct)) count++;
+            });
+          } else {
+            if (checkIndividualAnswer(userAnswers[q.id], q.correct)) count++;
+          }
+        });
+      });
+    });
+    return count;
+  };
+
+  const correctCount = getCorrectCount();
+  const bandScore = calculateBandScore(correctCount);
+
+  if (testStatus === 'idle') {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+        <div className="max-w-md w-full bg-white rounded-3xl shadow-xl p-10 text-center border">
+          <div className="w-20 h-20 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner">
+            <Timer size={40} />
+          </div>
+          <h1 className="text-3xl font-black text-slate-800 mb-4 tracking-tight uppercase">IELTS READING</h1>
+          <p className="text-slate-500 mb-8 leading-relaxed italic">Cumulative Reading Test (U5-U8)</p>
+          <button onClick={startTest} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-4 rounded-xl shadow-lg transition-all active:scale-95 uppercase tracking-widest">
+            <Play size={20} className="inline mr-3" /> Start Test
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (testStatus === 'finished') {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+        <div className="max-w-3xl w-full bg-white rounded-3xl shadow-2xl overflow-hidden border">
+          <div className="bg-indigo-700 p-12 text-white text-center">
+            <h2 className="text-sm opacity-60 mb-2 uppercase tracking-widest">Final Band Score</h2>
+            <div className="text-[10rem] font-black leading-none">{bandScore.toFixed(1)}</div>
+            <p className="mt-4 opacity-80 uppercase tracking-widest font-bold">Score: {correctCount} / 40</p>
+          </div>
+          <div className="p-10 text-center flex flex-col gap-4">
+             <button onClick={() => setTestStatus('reviewing')} className="w-full bg-blue-600 text-white font-black py-5 rounded-2xl shadow-lg hover:bg-blue-700 transition-all text-xl uppercase tracking-widest">
+                Check Answers
+              </button>
+              <button onClick={() => setTestStatus('idle')} className="text-slate-400 font-bold hover:text-slate-600 uppercase tracking-widest text-xs">
+                Back to Dashboard
+              </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const currentPassage = PASSAGES_DATA[currentPassageIdx];
+
+  return (
+    <div className="h-screen flex flex-col bg-white overflow-hidden font-sans">
+      <header className="h-20 border-b flex items-center justify-between px-8 bg-white shrink-0 z-30 shadow-sm">
+        <div className="flex items-center gap-6">
+          <div className="px-4 py-2 bg-blue-600 text-white rounded-xl font-black text-xs uppercase shadow-lg shadow-blue-100 tracking-wider">IELTS PRO</div>
+          <h2 className="font-bold text-slate-500 text-sm truncate max-w-sm">Section {currentPassageIdx + 1}: {currentPassage.title}</h2>
+        </div>
+        <div className="flex items-center gap-10">
+          <div className={`font-mono text-3xl font-black tracking-tighter ${timeLeft < 300 ? 'text-red-500 animate-pulse' : 'text-slate-800'}`}>
+            {formatTime(timeLeft)}
+          </div>
+          <button onClick={testStatus === 'testing' ? finishTest : () => setTestStatus('finished')} className="bg-red-500 hover:bg-red-600 text-white px-10 py-3 rounded-2xl text-sm font-black shadow-xl transition-all uppercase tracking-widest">
+            {testStatus === 'testing' ? 'Submit' : 'Exit Review'}
+          </button>
+        </div>
+      </header>
+
+      <main className="flex-1 flex overflow-hidden">
+        <div className="w-1/2 flex flex-col border-r relative group bg-white">
+          <div className="absolute top-6 right-8 opacity-0 group-hover:opacity-100 transition-all z-20">
+            <button onClick={() => {
+              const selection = window.getSelection();
+              if (!selection.rangeCount || selection.isCollapsed) return;
+              const range = selection.getRangeAt(0);
+              const span = document.createElement('span');
+              span.style.backgroundColor = 'rgba(254, 240, 138, 0.8)';
+              span.className = 'user-highlight';
+              try { range.surroundContents(span); } catch (e) {}
+              selection.removeAllRanges();
+            }} className="bg-yellow-300 text-slate-800 px-6 py-3 rounded-full shadow-2xl text-xs font-black border-2 border-yellow-500 hover:bg-yellow-400 active:scale-90 transition-all">
+              <Highlighter size={18} /> HIGHLIGHT
+            </button>
+          </div>
+          <div className="flex-1 overflow-y-auto p-16 bg-white selection:bg-yellow-100 scroll-smooth">
+            <div className="max-w-2xl mx-auto">
+              <h1 className="text-5xl font-black text-slate-800 mb-12 font-serif leading-tight">{currentPassage.title}</h1>
+              <div className="text-lg leading-[1.9] text-slate-600 passage-container text-justify space-y-6"
+                dangerouslySetInnerHTML={{ 
+                  __html: currentPassage.content.split('</span>').map(segment => {
+                    if (testStatus === 'reviewing' && reviewFocusId && segment.includes(`id="${reviewFocusId}"`)) {
+                      return segment.replace(`id="${reviewFocusId}"`, `id="${reviewFocusId}" class="bg-yellow-300 ring-4 ring-yellow-400/30 rounded-lg px-1 text-slate-900 font-medium transition-all duration-1000"`);
+                    }
+                    return segment;
+                  }).join('</span>')
+                }}
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="w-1/2 flex flex-col bg-slate-50">
+          <div className="h-16 border-b bg-white flex items-center px-8 gap-1 shrink-0 z-10 shadow-sm overflow-x-auto no-scrollbar">
+             {PASSAGES_DATA.map((_, idx) => (
+               <button key={idx} onClick={() => { setCurrentPassageIdx(idx); setReviewFocusId(null); }} className={`px-8 h-full text-[10px] font-black tracking-[0.2em] border-b-4 transition-all uppercase whitespace-nowrap ${currentPassageIdx === idx ? 'border-blue-600 text-blue-600 bg-blue-50/30' : 'border-transparent text-slate-300 hover:text-slate-500'}`}>
+                 Passage {idx + 1}
+               </button>
+             ))}
+          </div>
+
+          <div className="flex-1 overflow-y-auto p-12 scroll-smooth">
+            <div className="max-w-xl mx-auto space-y-16">
+              {currentPassage.groups.map((group, gIdx) => (
+                <div key={gIdx} className="space-y-8">
+                  <div className="bg-amber-50 border-l-4 border-amber-400 p-6 rounded-r-2xl shadow-sm">
+                    <p className="text-amber-800 font-black text-xs uppercase tracking-widest mb-1 tracking-tighter">Instruction</p>
+                    <p className="text-slate-700 font-medium italic leading-relaxed whitespace-pre-wrap">{group.instruction}</p>
+                  </div>
+
+                  {group.questions.map((q) => {
+                    if (q.type === 'paragraph-gap') {
+                      return (
+                        <div key={q.id} className="bg-white p-10 rounded-[2.5rem] shadow-sm border-2 border-slate-100">
+                           <div className="text-slate-800 font-medium text-lg leading-loose whitespace-pre-wrap">
+                              {q.text.split(/(\[q\d+\])/).map((part, i) => {
+                                const match = part.match(/\[(q\d+)\]/);
+                                if (match) {
+                                  const gapId = match[1];
+                                  const isCorrect = checkIndividualAnswer(userAnswers[gapId], q.gaps[gapId].correct);
+                                  return (
+                                    <span key={i} className="inline-block mx-1 align-baseline relative">
+                                      <input type="text" disabled={testStatus === 'reviewing'} value={userAnswers[gapId] || ""} onChange={(e) => setUserAnswers({...userAnswers, [gapId]: e.target.value})}
+                                        className={`px-3 py-1 border-b-2 bg-slate-50/50 rounded-t-lg outline-none w-32 text-blue-600 transition-all font-black text-center ${testStatus === 'reviewing' ? (isCorrect ? 'border-green-500 text-green-700' : 'border-red-500 text-red-700') : 'border-slate-200 focus:border-blue-500'}`} />
+                                    </span>
+                                  );
+                                }
+                                return part;
+                              })}
+                           </div>
+                        </div>
+                      );
+                    }
+
+                    const isCorrect = checkIndividualAnswer(userAnswers[q.id], q.correct);
+                    const isGap = q.type === "gap";
+                    
+                    return (
+                      <div key={q.id} className={`bg-white p-10 rounded-[2.5rem] shadow-sm border-2 transition-all duration-500 ${testStatus === 'reviewing' && reviewFocusId === q.sourceId ? 'border-blue-500 ring-[12px] ring-blue-50 translate-x-2' : 'border-slate-100'}`}>
+                        <div className="flex justify-between items-center mb-8">
+                          <span className="px-5 py-2 bg-slate-100 text-slate-400 rounded-full font-black text-[10px] tracking-widest uppercase">Question {q.id.replace('q', '')}</span>
+                          {testStatus === 'reviewing' && (
+                            isCorrect ? <span className="text-green-600 text-xs font-black bg-green-50 px-5 py-2 rounded-full ring-2 ring-green-100 uppercase tracking-widest">Correct</span> : 
+                            <span className="text-red-600 text-xs font-black bg-red-50 px-5 py-2 rounded-full ring-2 ring-red-100 uppercase tracking-widest">Incorrect</span>
+                          )}
+                        </div>
+                        
+                        <div className="text-slate-800 font-bold text-xl mb-10 leading-tight">
+                          {isGap ? (
+                            <div className="leading-loose">
+                              {q.text.split('______').map((part, i, arr) => (
+                                <React.Fragment key={i}>
+                                  {part}
+                                  {i < arr.length - 1 && (
+                                    <input type="text" disabled={testStatus === 'reviewing'} placeholder="..." value={userAnswers[q.id] || ""} onChange={(e) => setUserAnswers({...userAnswers, [q.id]: e.target.value})}
+                                      className={`mx-3 px-4 py-2 border-b-4 bg-slate-50/50 rounded-t-xl outline-none w-48 text-blue-600 transition-all font-black ${testStatus === 'reviewing' ? (isCorrect ? 'border-green-500 text-green-700' : 'border-red-500 text-red-700') : 'border-slate-200 focus:border-blue-500'}`} />
+                                  )}
+                                </React.Fragment>
+                              ))}
                             </div>
-                            <h1 className="text-4xl font-black text-slate-800 mb-4 tracking-tight">IELTS PRO</h1>
-                            <p className="text-slate-500 mb-10 font-medium italic">Cumulative Reading Test (U5-U8)</p>
-                            <button onClick={() => setStatus('testing')} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-5 rounded-2xl transition-all active:scale-95 shadow-lg flex items-center justify-center gap-3">
-                                <PlayIcon /> BẮT ĐẦU LÀM BÀI
-                            </button>
-                        </div>
-                    </div>
-                );
-            }
-
-            if (status === 'finished') {
-                const score = calculateScore();
-                return (
-                    <div className="min-h-screen flex items-center justify-center bg-slate-100">
-                        <div className="bg-white p-16 rounded-[3rem] shadow-2xl text-center max-w-2xl w-full border">
-                            <h2 className="text-sm font-black text-blue-600 uppercase tracking-[0.3em] mb-4">KẾT QUẢ CỦA BẠN</h2>
-                            <div className="text-9xl font-black text-slate-800 mb-6">{score}</div>
-                            <p className="text-slate-400 font-bold mb-10 uppercase tracking-widest">ĐIỂM SỐ / 40 CÂU</p>
-                            <button onClick={() => setStatus('review')} className="bg-slate-800 text-white px-12 py-4 rounded-2xl font-bold hover:bg-slate-900 transition-all">XEM LẠI ĐÁP ÁN</button>
-                        </div>
-                    </div>
-                );
-            }
-
-            const passage = PASSAGES_DATA[currentPassage];
-
-            return (
-                <div className="h-screen flex flex-col bg-white overflow-hidden">
-                    <header className="h-20 border-b flex items-center justify-between px-10 shrink-0 z-20">
-                        <div className="flex items-center gap-4">
-                            <span className="bg-blue-600 text-white px-4 py-1.5 rounded-xl font-black text-xs">PASSAGE {currentPassage + 1}</span>
-                            <h2 className="font-bold text-slate-400 text-sm truncate max-w-sm">{passage.title}</h2>
-                        </div>
-                        <div className="flex items-center gap-8">
-                            <div className="font-mono text-3xl font-black tracking-tighter text-slate-800">{formatTime(timeLeft)}</div>
-                            <button onClick={() => setStatus('finished')} className="bg-red-500 hover:bg-red-600 text-white px-8 py-3 rounded-2xl text-sm font-black transition-all">NỘP BÀI</button>
-                        </div>
-                    </header>
-
-                    <main className="flex-1 flex overflow-hidden">
-                        {/* Text Panel */}
-                        <div className="w-1/2 overflow-y-auto p-16 border-r scroll-smooth bg-white">
-                            <div className="max-w-2xl mx-auto">
-                                <h1 className="text-5xl font-black text-slate-900 mb-12 font-serif leading-tight">{passage.title}</h1>
-                                <div className="passage-content text-lg text-slate-600" 
-                                     dangerouslySetInnerHTML={{
-                                         __html: passage.content.split('</span>').map(seg => {
-                                             if (status === 'review' && reviewId && seg.includes(`id="${reviewId}"`)) {
-                                                 return seg.replace(`id="${reviewId}"`, `id="${reviewId}" class="bg-yellow-200 ring-4 ring-yellow-400/20 rounded px-1 text-slate-900 font-bold transition-all duration-1000"`);
-                                             }
-                                             return seg;
-                                         }).join('</span>')
-                                     }} 
-                                />
-                            </div>
+                          ) : q.text}
                         </div>
 
-                        {/* Questions Panel */}
-                        <div className="w-1/2 overflow-y-auto p-12 bg-slate-50 scroll-smooth">
-                            <div className="max-w-xl mx-auto space-y-12">
-                                {passage.groups.map((group, gIdx) => (
-                                    <div key={gIdx} className="space-y-6">
-                                        <div className="bg-amber-50 border-l-4 border-amber-400 p-6 rounded-r-2xl text-amber-900 italic font-medium text-sm">
-                                            {group.instruction}
-                                        </div>
-                                        {group.questions.map(q => {
-                                            const isCorrect = checkAns(answers[q.id], q.correct);
-                                            return (
-                                                <div key={q.id} className={`bg-white p-8 rounded-[2rem] shadow-sm border-2 transition-all ${status === 'review' && reviewId === q.sourceId ? 'border-blue-500 ring-8 ring-blue-50' : 'border-slate-100'}`}>
-                                                    <div className="flex justify-between items-center mb-6">
-                                                        <span className="text-[10px] font-black text-slate-400 tracking-widest uppercase">CÂU {q.id.replace('q','')}</span>
-                                                        {status === 'review' && (
-                                                            isCorrect ? <span className="text-green-600 text-xs font-black uppercase">Đúng</span> : <span className="text-red-600 text-xs font-black uppercase">Sai</span>
-                                                        )}
-                                                    </div>
-                                                    <p className="text-slate-800 font-bold text-xl mb-8 leading-snug">{q.text}</p>
-                                                    
-                                                    {q.type === 'choice' ? (
-                                                        <div className="space-y-3">
-                                                            {q.options.map(opt => (
-                                                                <button key={opt} disabled={status === 'review'} onClick={() => setAnswers({...answers, [q.id]: opt})}
-                                                                        className={`w-full text-left p-4 rounded-xl border-2 transition-all text-sm font-bold flex items-center gap-4
-                                                                            ${answers[q.id] === opt ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-slate-50 text-slate-500'}
-                                                                            ${status === 'review' && opt.startsWith(q.correct.charAt(0)) ? 'border-green-500 bg-green-50' : ''}
-                                                                        `}>
-                                                                    <div className={`w-5 h-5 rounded-full border-2 ${answers[q.id] === opt ? 'bg-blue-600 border-blue-600' : 'border-slate-200'}`} />
-                                                                    {opt}
-                                                                </button>
-                                                            ))}
-                                                        </div>
-                                                    ) : (
-                                                        <input type="text" disabled={status === 'review'} value={answers[q.id] || ""} placeholder="Nhập đáp án..."
-                                                               onChange={(e) => setAnswers({...answers, [q.id]: e.target.value})}
-                                                               className={`w-full p-4 border-b-4 outline-none font-bold text-blue-600 bg-slate-50/50 rounded-t-xl ${status === 'review' ? (isCorrect ? 'border-green-500' : 'border-red-500') : 'border-slate-200 focus:border-blue-500'}`} />
-                                                    )}
-
-                                                    {status === 'review' && (
-                                                        <div className="mt-8 pt-8 border-t border-slate-50">
-                                                            <button onClick={() => { setReviewId(q.sourceId); document.getElementById(q.sourceId)?.scrollIntoView({behavior:'smooth', block:'center'}); }} 
-                                                                    className="text-blue-600 text-xs font-black flex items-center gap-2 mb-4 hover:underline">
-                                                                <InfoIcon /> XEM TRÍCH DẪN
-                                                            </button>
-                                                            <div className="bg-slate-50 p-6 rounded-2xl text-xs text-slate-500 leading-relaxed italic border">
-                                                                <span className="font-black text-slate-700 uppercase block mb-1">Giải thích:</span>
-                                                                {q.explanation}
-                                                            </div>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            )
-                                        })}
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    </main>
-
-                    <footer className="h-20 border-t flex items-center justify-between px-12 shrink-0">
-                        <button disabled={currentPassage === 0} onClick={() => setCurrentPassage(prev => prev - 1)} className="text-slate-400 font-black text-xs uppercase disabled:opacity-20 flex items-center gap-2">← TRƯỚC</button>
-                        <div className="flex gap-2">
-                            {[0,1,2].map(idx => (
-                                <button key={idx} onClick={() => setCurrentPassage(idx)} className={`w-10 h-10 rounded-xl font-black text-xs transition-all ${currentPassage === idx ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-400 hover:bg-slate-200'}`}>{idx + 1}</button>
+                        {!isGap && (
+                          <div className="grid grid-cols-1 gap-3">
+                            {q.options.map((opt, optIdx) => (
+                              <button key={`${q.id}-opt-${optIdx}`} disabled={testStatus === 'reviewing'} onClick={() => setUserAnswers(prev => ({...prev, [q.id]: opt}))}
+                                className={`w-full text-left p-6 rounded-2xl border-2 transition-all flex items-center gap-5 text-sm font-bold
+                                  ${userAnswers[q.id] === opt ? 'border-blue-500 bg-blue-50 text-blue-700 shadow-xl' : 'border-slate-50 hover:border-slate-200 text-slate-500'}
+                                  ${testStatus === 'reviewing' && checkIndividualAnswer(opt, q.correct) ? 'border-green-500 bg-green-50 text-green-700 ring-4 ring-green-100' : ''}
+                                  ${testStatus === 'reviewing' && userAnswers[q.id] === opt && !checkIndividualAnswer(opt, q.correct) ? 'border-red-500 bg-red-50 text-red-700 opacity-60' : ''}
+                                `}>
+                                <div className={`w-6 h-6 rounded-full border-2 shrink-0 flex items-center justify-center transition-all ${userAnswers[q.id] === opt ? 'bg-blue-600 border-blue-600 shadow-lg' : 'border-slate-200'}`}>
+                                   {userAnswers[q.id] === opt && <div className="w-2 h-2 bg-white rounded-full"></div>}
+                                </div>
+                                {opt}
+                              </button>
                             ))}
-                        </div>
-                        <button disabled={currentPassage === 2} onClick={() => setCurrentPassage(prev => prev + 1)} className="text-slate-400 font-black text-xs uppercase disabled:opacity-20 flex items-center gap-2">SAU →</button>
-                    </footer>
-                </div>
-            );
-        }
+                          </div>
+                        )}
 
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
-    </script>
-</body>
-</html>
+                        {testStatus === 'reviewing' && (
+                          <div className="mt-10 pt-10 border-t-4 border-slate-50">
+                            <button onClick={() => { setReviewFocusId(q.sourceId); document.getElementById(q.sourceId)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }}
+                              className="text-blue-600 text-sm font-black flex items-center gap-3 mb-6 hover:bg-blue-50 px-5 py-3 rounded-2xl transition-all uppercase tracking-widest active:scale-95 group">
+                              <Info size={20} className="group-hover:rotate-12 transition-transform" /> Locate in passage
+                            </button>
+                            <div className="bg-slate-50 p-8 rounded-[2rem] text-sm text-slate-600 border shadow-inner leading-relaxed border-slate-100">
+                              <p className="font-black text-slate-800 mb-2 uppercase text-[10px] tracking-[0.2em] flex items-center gap-2">
+                                <span className="w-2 h-2 bg-blue-500 rounded-full"></span> Correct Answer: <span className="text-blue-600 font-bold">{q.correct}</span>
+                              </p>
+                              <p className="italic font-medium text-slate-500 leading-relaxed">"{q.explanation}"</p>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              ))}
+            </div>
+          </div>
+          
+          <div className="h-24 border-t bg-white flex items-center justify-between px-12 shrink-0 z-20 shadow-sm">
+            <button disabled={currentPassageIdx === 0} onClick={() => { setCurrentPassageIdx(prev => prev - 1); setReviewFocusId(null); }} className="text-slate-400 font-black text-xs uppercase disabled:opacity-10 hover:text-blue-600 transition-all tracking-[0.2em] flex items-center gap-2 active:translate-x-[-4px]">
+              <ChevronLeft size={20} /> Previous
+            </button>
+            <div className="bg-slate-100 px-8 py-3 rounded-full text-[10px] font-black text-slate-400 uppercase tracking-[0.4em] shadow-inner">Passage {currentPassageIdx + 1} / 3</div>
+            <button disabled={currentPassageIdx === 2} onClick={() => { setCurrentPassageIdx(prev => prev + 1); setReviewFocusId(null); }} className="text-slate-400 font-black text-xs uppercase disabled:opacity-10 hover:text-blue-600 transition-all tracking-[0.2em] flex items-center gap-2 active:translate-x-[4px]">
+              Next Passage <ChevronRight size={20} />
+            </button>
+          </div>
+        </div>
+      </main>
+
+      <style>{`
+        .user-highlight { border-radius: 6px; padding: 2px 0; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; border: 2px solid white; }
+        ::-webkit-scrollbar-thumb:hover { background: #cbd5e1; }
+        input::placeholder { color: #cbd5e1; font-weight: 500; font-size: 0.85rem; }
+        .passage-container p { margin-bottom: 2.5rem; }
+      `}</style>
+    </div>
+  );
+};
+
+export default App;
