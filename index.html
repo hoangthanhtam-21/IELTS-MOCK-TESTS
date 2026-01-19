@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -34,7 +34,7 @@
     <script type="text/babel">
         const { useState, useEffect, useRef } = React;
 
-        // --- Biểu tượng SVG ---
+        // --- SVG Icons ---
         const TimerIcon = () => (
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
         );
@@ -54,38 +54,56 @@
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 11-6 6v3h9l3-3"/><path d="m22 12-4.6 4.6a2 2 0 0 1-2.8 0l-5.2-5.2a2 2 0 0 1 0-2.8L14 4"/></svg>
         );
 
-        // --- DỮ LIỆU BÀI ĐỌC ---
+        // --- PASSAGE DATA ---
         const PASSAGES_DATA = [
           {
             id: 1,
             title: "How tennis rackets have changed",
             content: `
-              <p><span id="s1">In 2016, the British professional tennis player Andy Murray was ranked as the world’s number one.</span> <span id="s2">It was an incredible achievement by any standard...</span> <span id="s3">Yet five years previously, he had been regarded as a talented outsider who entered but never won the major tournaments.</span></p>
-              <p><span id="s4">Of the changes that account for this transformation, one was visible and widely publicised: in 2011, Murray invited former number one player Ivan Lendl onto his coaching team...</span> <span id="s5">Another change was so subtle as to pass more or less unnoticed.</span> <span id="s6">Murray has long preferred a racket that consists of two types of string: one for the mains (verticals) and another for the crosses (horizontals).</span> <span id="s7">While he continued to use natural string in the crosses, in 2012 he switched to a synthetic string for the mains.</span></p>
-              <p><span id="s10">‘Touring professionals have their rackets customised to their specific needs,’ says Colin Triplow...</span> <span id="s12">the specific rackets used by the world’s elite are not actually readily available to the public; rather, each racket is individually made to suit the player who uses it.</span> <span id="s15">They explain how they have adjusted not only racket length, but even experimented with different kinds of paint.</span> <span id="s16">The rackets they use now weigh more than the average model and also have a denser string pattern.</span></p>
-              <p><span id="s19">Racket modifications mainly date back to the 1970s, when the amateur German tennis player Werner Fischer started playing with the so-called spaghetti-strung racket.</span> <span id="s20">It created a string bed that generated so much topspin that it was quickly banned.</span> <span id="s22">Today it is equal in significance to nutrition or training.</span></p>
-              <p><span id="s25">Players will continually change string tension depending on factors bao gồm court surface, climatic conditions, and game styles.</span></p>
-              <p><span id="s27">At one time, all tennis rackets were strung with natural gut made from the outer layer of sheep or cow intestines.</span></p>
-              <p><span id="s36">Much of the serving power of US professional player Pete Sampras was attributed to the addition of four to five lead weights onto his rackets.</span></p>
-              <p><span id="s40">Gonçalo Oliveira replaced the original grips of his rackets with something thinner because they had previously felt uncomfortable to hold.</span></p>
+              <p><span id="s1">In 2016, the British professional tennis player Andy Murray was ranked as the world’s number one.</span> <span id="s2">It was an incredible achievement by any standard – made even more remarkable by the fact that he did this during a period considered to be one of the strongest in the sport’s history, competing against the likes of Rafael Nadal, Roger Federer and Novak Djokovic, to name just a few.</span> <span id="s3">Yet five years previously, he had been regarded as a talented outsider who entered but never won the major tournaments.</span></p>
+              
+              <p><span id="s4">Of the changes that account for this transformation, one was visible and widely publicised: in 2011, Murray invited former number one player Ivan Lendl onto his coaching team – a valuable addition that had a visible impact on the player’s playing style.</span> <span id="s5">Another change was so subtle as to pass more or less unnoticed.</span> <span id="s6">Like many players, Murray has long preferred a racket that consists of two types of string: one for the mains (verticals) and another for the crosses (horizontals).</span> <span id="s7">While he continued to use natural string in the crosses, in 2012 he switched to a synthetic string for the mains.</span> <span id="s8">A small change, perhaps, but its importance should not be underestimated.</span></p>
+
+              <p><span id="s9">The modification that Murray made is just one of a number of options available to players looking to tweak their rackets in order to improve their games.</span> <span id="s10">‘Touring professionals have their rackets customised to their specific needs,’ says Colin Triplow, a UK-based professional racket stringer.</span> <span id="s11">‘It’s a highly important part of performance maximisation.’</span> <span id="s12">Consequently, the specific rackets used by the world’s elite are not actually readily available to the public; rather, each racket is individually made to suit the player who uses it.</span> <span id="s13">Take the US professional tennis players Mike and Bob Bryan, for example: ‘We’re very particular with our racket specifications,’ they say.</span> <span id="s14">‘All our rackets are sent from our manufacturer to Tampa, Florida, where our frames go through a … thorough customisation process.’</span> <span id="s15">They explain how they have adjusted not only racket length, but even experimented with different kinds of paint.</span> <span id="s16">The rackets they use now weigh more than the average model and also have a denser string pattern (i.e. more crosses and mains).</span></p>
+
+              <p><span id="s17">The primary reason for these modifications is simple: as the line between winning and losing becomes thinner and thinner, even these slight changes become more and more important.</span> <span id="s18">As a result, players and their teams are becoming increasingly creative with the modifications to their rackets as they look to maximise their competitive advantage.</span></p>
+
+              <p><span id="s19">Racket modifications mainly date back to the 1970s, when the amateur German tennis player Werner Fischer started playing with the so-called spaghetti-strung racket.</span> <span id="s20">It created a string bed that generated so much topspin that it was quickly banned by the International Tennis Federation.</span> <span id="s21">However, within a decade or two, racket modification became a regularity.</span> <span id="s22">Today it is, in many ways, an aspect of the game that is equal in significance to nutrition or training.</span></p>
+
+              <p><span id="s23">Modifications can be divided into two categories: those to the string bed and those to the racket frame.</span> <span id="s24">The former is far more common than the latter: the choice of the strings and the tension with which they are installed is something that nearly all professional players experiment with.</span> <span id="s25">They will continually change it depending on various factors including the court surface, climatic conditions, and game styles.</span> <span id="s26">Some will even change it depending on how they feel at the time.</span></p>
+
+              <p><span id="s27">At one time, all tennis rackets were strung with natural gut made from the outer layer of sheep or cow intestines.</span> <span id="s28">This all changed in the early 1990s with the development of synthetic strings that were cheaper and more durable.</span> <span id="s29">They are made from three materials: nylon (relatively durable and affordable), Kevlar (too stiff to be used alone) or co-polyester (polyester combined with additives that enhance its performance).</span> <span id="s30">Even so, many professional players continue to use a ‘hybrid set-up’, where a combination of both synthetic and natural strings are used.</span></p>
+
+              <p><span id="s31">Of the synthetics, co-polyester is by far the most widely used.</span> <span id="s32">It’s a perfect fit for the style of tennis now played, where players tend to battle it out from the back of the court rather than coming to the net.</span> <span id="s33">Studies indicate that the average spin from a co-polyester string is 25% greater than that from natural string or other synthetics.</span> <span id="s34">In a sense, the development of co-polyester strings has revolutionised the game.</span></p>
+
+              <p><span id="s35">However, many players go beyond these basic adjustments to the strings and make changes to the racket frame itself.</span> <span id="s36">For example, much of the serving power of US professional player Pete Sampras was attributed to the addition of four to five lead weights onto his rackets, and today many professionals have the weight adjusted during the manufacturing process.</span></p>
+
+              <p><span id="s37">Other changes to the frame involve the handle.</span> <span id="s38">Players have individual preferences for the shape of the handle and some will have the handle of one racket moulded onto the frame of a different racket.</span> <span id="s39">Other players make different changes.</span> <span id="s40">The professional Portuguese player Gonçalo Oliveira replaced the original grips of his rackets with something thinner because they had previously felt uncomfortable to hold.</span></p>
+
+              <p><span id="s41">Racket customisation and modification have pushed the standards of the game to greater levels that few could have anticipated in the days of natural strings and heavy, wooden frames, and it’s exciting to see what further developments there will be in the future.</span></p>
             `,
             groups: [
               {
-                instruction: "Do the following statements agree with the information? Write TRUE, FALSE or NOT GIVEN.",
+                instruction: "Do the following statements agree with the information given in Reading Passage 1?\nTRUE if the statement agrees with the information\nFALSE if the statement contradicts the information\nNOT GIVEN if there is no information on this",
                 questions: [
-                  { id: "q1", type: "choice", text: "1. People had expected Andy Murray to become the world's top player for at least five years before 2016.", options: ["TRUE", "FALSE", "NOT GIVEN"], correct: "FALSE", explanation: "Murray was considered a talented outsider 5 years prior.", sourceId: "s3" },
-                  { id: "q2", type: "choice", text: "2. The change that Andy Murray made to his rackets attracted a lot of attention.", options: ["TRUE", "FALSE", "NOT GIVEN"], correct: "FALSE", explanation: "The change was so subtle it passed unnoticed.", sourceId: "s5" },
-                  { id: "q4", type: "choice", text: "4. Mike and Bob Bryan use rackets that are light in comparison to the majority of rackets.", options: ["TRUE", "FALSE", "NOT GIVEN"], correct: "FALSE", explanation: "Their rackets weigh more than the average model.", sourceId: "s16" },
-                  { id: "q7", type: "choice", text: "7. It was believed that the change Pete Sampras made to his rackets contributed to his strong serve.", options: ["TRUE", "FALSE", "NOT GIVEN"], correct: "TRUE", explanation: "Serving power was attributed to the addition of lead weights.", sourceId: "s36" }
+                  { id: "q1", type: "choice", text: "1. People had expected Andy Murray to become the world's top tennis player for at least five years before 2016.", options: ["TRUE", "FALSE", "NOT GIVEN"], correct: "FALSE", explanation: "Bài đọc thể hiện rằng vào thời điểm 5 năm trước 2016, Andy Murray được xem là một người không bao giờ thắng các giải đấu lớn, trái ngược với kỳ vọng trở thành tay vợt số 1 thế giới.", sourceId: "s3" },
+                  { id: "q2", type: "choice", text: "2. The change that Andy Murray made to his rackets attracted a lot of attention.", options: ["TRUE", "FALSE", "NOT GIVEN"], correct: "FALSE", explanation: "Bài đọc chỉ ra rằng thay đổi của Murray tinh vi đến mức gần như không được chú ý đến (pass more or less unnoticed), trái ngược với việc thu hút nhiều sự chú ý.", sourceId: "s5" },
+                  { id: "q3", type: "choice", text: "3. Most of the world's top players take a professional racket stringer on tour with them.", options: ["TRUE", "FALSE", "NOT GIVEN"], correct: "NOT GIVEN", explanation: "Tác giả đề cập đến thợ căng dây chuyên nghiệp điều chỉnh vợt theo yêu cầu nhưng không nói về việc các vận động viên có mang họ đi cùng trong các chuyến du đấu hay không.", sourceId: "s10" },
+                  { id: "q4", type: "choice", text: "4. Mike and Bob Bryan use rackets that are light in comparison to the majority of rackets.", options: ["TRUE", "FALSE", "NOT GIVEN"], correct: "FALSE", explanation: "Vợt của anh em nhà Bryan thực tế nặng hơn (weigh more than) các mẫu vợt trung bình.", sourceId: "s16" },
+                  { id: "q5", type: "choice", text: "5. Werner Fischer played with a spaghetti-strung racket that he designed himself.", options: ["TRUE", "FALSE", "NOT GIVEN"], correct: "NOT GIVEN", explanation: "Văn bản xác nhận Fischer sử dụng loại vợt này nhưng không đề cập đến việc ông có phải là người tự thiết kế ra nó hay không.", sourceId: "s19" },
+                  { id: "q6", type: "choice", text: "6. The weather can affect how professional players adjust the strings on their rackets.", options: ["TRUE", "FALSE", "NOT GIVEN"], correct: "TRUE", explanation: "Việc điều chỉnh phụ thuộc vào nhiều yếu tố, bao gồm cả điều kiện khí hậu (climatic conditions).", sourceId: "s25" },
+                  { id: "q7", type: "choice", text: "7. It was believed that the change Pete Sampras made to his rackets contributed to his strong serve.", options: ["TRUE", "FALSE", "NOT GIVEN"], correct: "TRUE", explanation: "Lực giao bóng mạnh của Sampras được cho là nhờ vào việc bổ sung các quả nặng bằng chì vào vợt.", sourceId: "s36" }
                 ]
               },
               {
-                instruction: "Complete the notes below. Choose ONE WORD ONLY.",
+                instruction: "Complete the notes below. Choose ONE WORD ONLY from the passage for each answer. Write your answers in boxes 8-13.",
                 questions: [
-                  { id: "q8", type: "gap", text: "Mike and Bob Bryan made changes to the types of ______ used on their racket frames.", correct: "paint", explanation: "They experimented with different kinds of paint.", sourceId: "s15" },
-                  { id: "q9", type: "gap", text: "Players were not allowed to use the spaghetti-strung racket because of the amount of ______ it created.", correct: "topspin", explanation: "Generated too much topspin.", sourceId: "s20" },
-                  { id: "q11", type: "gap", text: "All rackets used to have natural strings made from the ______ of animals.", correct: "intestines/gut", explanation: "Made from sheep or cow intestines (gut).", sourceId: "s27" },
-                  { id: "q13", type: "gap", text: "Gongalo Oliveira changed the ______ on his racket handles.", correct: "grips", explanation: "Oliveira replaced the original grips.", sourceId: "s40" }
+                  { id: "q8", type: "gap", text: "8. Mike and Bob Bryan made changes to the types of ______ used on their racket frames.", correct: "paint", explanation: "Đoạn 3 cho biết họ đã thử nghiệm với nhiều loại nước sơn (different kinds of paint) khác nhau.", sourceId: "s15" },
+                  { id: "q9", type: "gap", text: "9. Players were not allowed to use the spaghetti-strung racket because of the amount of ______ it created.", correct: "topspin", explanation: "Loại vợt này bị cấm vì nó tạo ra quá nhiều lực xoáy (generated so much topspin).", sourceId: "s20" },
+                  { id: "q10", type: "gap", text: "10. Changes to rackets can be regarded as being as important as players’ diets or the ______ they do.", correct: "training", explanation: "Việc thay đổi vợt có tầm quan trọng tương đương dinh dưỡng (nutrition) hoặc luyện tập (training).", sourceId: "s22" },
+                  { id: "q11", type: "gap", text: "11. All rackets used to have natural strings made from the ______ of animals.", correct: "intestines/gut", explanation: "Dây vợt tự nhiên được làm từ ruột (intestines/gut) của cừu hoặc bò.", sourceId: "s27" },
+                  { id: "q12", type: "gap", text: "12. Pete Sampras had metal ______ put into the frames of his rackets.", correct: "weights", explanation: "Sampras đã thêm các quả nặng bằng chì (lead weights) - một loại kim loại - vào khung vợt.", sourceId: "s36" },
+                  { id: "q13", type: "gap", text: "13. Gongalo Oliveira changed the ______ on his racket handles.", correct: "grips", explanation: "Oliveira đã thay thế dây quấn cán vợt (grips) nguyên bản bằng loại mỏng hơn.", sourceId: "s40" }
                 ]
               }
             ]
@@ -103,7 +121,7 @@
             `,
             groups: [
               {
-                instruction: "Which paragraph contains the following information? A-F.",
+                instruction: "Which paragraph contains the following information? Write the correct letter, A-F.",
                 questions: [
                   { id: "q14", type: "gap", text: "14. how further disappearance of multiple species could be avoided: ______", correct: "F", explanation: "Para F discusses preventing mass extinctions.", sourceId: "s74" },
                   { id: "q15", type: "gap", text: "15. reproducing an extinct animal using DNA of only that species: ______", correct: "A", explanation: "Para A describes cloning technology.", sourceId: "s46" },
@@ -112,7 +130,7 @@
                 ]
               },
               {
-                instruction: "Match statement with person: Novak, Archer, Shapiro, Church.",
+                instruction: "Match each statement with the correct person: Novak, Archer, Shapiro, Church.",
                 questions: [
                   { id: "q23", type: "choice", text: "23. Reintroducing an extinct species could improve the health of a species living there.", options: ["Ben Novak", "Michael Archer", "Beth Shapiro", "George Church"], correct: "Michael Archer", explanation: "Archer mentions thylacines helping devils' health.", sourceId: "s53" },
                   { id: "q25", type: "choice", text: "25. A realistic goal is to create an animal similar to an extinct species.", options: ["Ben Novak", "Michael Archer", "Beth Shapiro", "George Church"], correct: "Beth Shapiro", explanation: "Shapiro suggests hybrid species.", sourceId: "s58" },
@@ -141,7 +159,7 @@
                 ]
               },
               {
-                instruction: "Complete sentence endings A-G.",
+                instruction: "Complete each sentence with the correct ending A-G.",
                 questions: [
                   { id: "q37", type: "choice", text: "37. Monkeys on Koshima island showed that", options: ["A. success", "C. status", "F. observation habits"], correct: "F. observation habits", explanation: "Habit spread by observation.", sourceId: "s103" },
                   { id: "q39", type: "choice", text: "39. Dick Fosbury is mentioned to show that", options: ["A. success behavior", "C. status", "F. observation"], correct: "A. success behavior", explanation: "Copied style, not shoes.", sourceId: "s117" }
@@ -152,10 +170,16 @@
         ];
 
         const calculateBandScore = (count) => {
-            if (count >= 30) return 7.5;
-            if (count >= 23) return 6.5;
-            if (count >= 15) return 5.5;
-            return 4.5;
+            if (count >= 39) return 9.0;
+            if (count >= 37) return 8.5;
+            if (count >= 35) return 8.0;
+            if (count >= 33) return 7.5;
+            if (count >= 30) return 7.0;
+            if (count >= 27) return 6.5;
+            if (count >= 23) return 6.0;
+            if (count >= 19) return 5.5;
+            if (count >= 15) return 5.0;
+            return 4.0;
         };
 
         const App = () => {
@@ -210,9 +234,9 @@
                     <TimerIcon />
                   </div>
                   <h1 className="text-3xl font-black text-slate-800 mb-4 tracking-tight uppercase">IELTS READING</h1>
-                  <p className="text-slate-400 mb-10 italic">Luyện tập Reading - 40 Câu hỏi</p>
+                  <p className="text-slate-400 mb-10 italic">Full Practice - 40 Questions</p>
                   <button onClick={startTest} className="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-5 rounded-2xl shadow-lg transition-all active:scale-95 uppercase tracking-widest text-lg">
-                    <PlayIcon /> Bắt đầu ngay
+                    <PlayIcon /> Start Now
                   </button>
                 </div>
               </div>
@@ -223,9 +247,10 @@
             return (
               <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
                 <div className="max-w-md w-full bg-white rounded-[2.5rem] shadow-2xl p-12 text-center border">
-                  <h2 className="text-sm opacity-40 mb-2 uppercase tracking-widest font-black">Kết quả</h2>
+                  <h2 className="text-sm opacity-40 mb-2 uppercase tracking-widest font-black">Results</h2>
                   <div className="text-9xl font-black text-blue-600 mb-4 leading-none">{score}</div>
-                  <p className="text-slate-400 font-bold mb-10 uppercase tracking-widest">Số câu đúng / 40</p>
+                  <p className="text-slate-400 font-bold mb-4 uppercase tracking-widest">Correct answers / 40</p>
+                  <p className="text-blue-600 font-black text-2xl mb-10 uppercase tracking-tighter tracking-widest">Band {calculateBandScore(score).toFixed(1)}</p>
                   <button onClick={() => setTestStatus('reviewing')} className="w-full bg-slate-800 text-white font-black py-5 rounded-2xl uppercase tracking-widest hover:bg-black transition-all">Review Answers</button>
                 </div>
               </div>
@@ -243,7 +268,7 @@
                 </div>
                 <div className="flex items-center gap-8">
                   <div className="font-mono text-2xl font-black text-slate-800">{formatTime(timeLeft)}</div>
-                  <button onClick={finishTest} className="bg-red-500 text-white px-8 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-red-50">Nộp bài</button>
+                  <button onClick={finishTest} className="bg-red-500 text-white px-8 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-lg shadow-red-50">Submit</button>
                 </div>
               </header>
 
@@ -280,7 +305,7 @@
                   <div className="max-w-xl mx-auto space-y-12 pb-24">
                     {currentPassage.groups.map((group, gIdx) => (
                       <div key={gIdx} className="space-y-8">
-                        <div className="bg-amber-50 border-l-4 border-amber-400 p-8 rounded-r-2xl shadow-sm italic text-slate-700 text-sm leading-relaxed">
+                        <div className="bg-amber-50 border-l-4 border-amber-400 p-8 rounded-r-2xl shadow-sm italic text-slate-700 text-sm leading-relaxed whitespace-pre-wrap">
                           {group.instruction}
                         </div>
                         {group.questions.map((q) => {
@@ -288,9 +313,9 @@
                           return (
                             <div key={q.id} className={`bg-white p-10 rounded-[2.5rem] shadow-sm border-2 transition-all ${testStatus === 'reviewing' && reviewFocusId === q.sourceId ? 'border-blue-500 ring-[12px] ring-blue-50' : 'border-slate-100'}`}>
                               <div className="flex justify-between items-center mb-6">
-                                <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Câu {q.id.replace('q', '')}</span>
+                                <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Question {q.id.replace('q', '')}</span>
                                 {testStatus === 'reviewing' && (
-                                  isCorrect ? <span className="text-green-600 text-[10px] font-black uppercase tracking-widest">Đúng</span> : <span className="text-red-600 text-[10px] font-black uppercase tracking-widest">Sai</span>
+                                  isCorrect ? <span className="text-green-600 text-[10px] font-black uppercase tracking-widest">Correct</span> : <span className="text-red-600 text-[10px] font-black uppercase tracking-widest">Incorrect</span>
                                 )}
                               </div>
                               <p className="text-slate-800 font-bold text-xl mb-8 leading-snug">{q.text}</p>
@@ -307,17 +332,17 @@
                                   ))}
                                 </div>
                               ) : (
-                                <input type="text" disabled={testStatus === 'reviewing'} placeholder="Nhập đáp án..." value={userAnswers[q.id] || ""} onChange={(e) => setUserAnswers({...userAnswers, [q.id]: e.target.value})}
+                                <input type="text" disabled={testStatus === 'reviewing'} placeholder="Type your answer..." value={userAnswers[q.id] || ""} onChange={(e) => setUserAnswers({...userAnswers, [q.id]: e.target.value})}
                                   className={`w-full p-5 border-b-4 outline-none font-black text-2xl text-blue-600 bg-slate-50/50 rounded-t-2xl ${testStatus === 'reviewing' ? (isCorrect ? 'border-green-500 text-green-700' : 'border-red-500 text-red-700') : 'border-slate-200 focus:border-blue-500'}`} />
                               )}
                               {testStatus === 'reviewing' && (
-                                <div className="mt-8 pt-8 border-t border-slate-50">
+                                <div className="mt-8 pt-8 border-t border-slate-50 text-justify">
                                   <button onClick={() => { setReviewFocusId(q.sourceId); document.getElementById(q.sourceId)?.scrollIntoView({ behavior: 'smooth', block: 'center' }); }}
                                     className="text-blue-600 text-[10px] font-black uppercase flex items-center gap-2 mb-4 hover:bg-blue-50 px-4 py-2 rounded-xl transition-all">
-                                    <InfoIcon /> Xem trích dẫn
+                                    <InfoIcon /> View Citation
                                   </button>
                                   <p className="text-sm text-slate-500 italic leading-relaxed">"{q.explanation}"</p>
-                                  <p className="text-sm font-black mt-4 uppercase tracking-widest text-blue-600">Đáp án: {q.correct}</p>
+                                  <p className="text-sm font-black mt-4 uppercase tracking-widest text-blue-600">Answer: {q.correct}</p>
                                 </div>
                               )}
                             </div>
@@ -331,7 +356,7 @@
 
               <footer className="h-20 border-t flex items-center justify-between px-12 bg-white shrink-0 shadow-2xl z-30">
                 <button disabled={currentPassageIdx === 0} onClick={() => setCurrentPassageIdx(prev => prev - 1)} className="text-slate-400 font-black text-[10px] uppercase flex items-center gap-3 hover:text-blue-600 transition-all tracking-widest disabled:opacity-20">
-                  <ChevronLeftIcon /> Bài trước
+                  <ChevronLeftIcon /> Previous
                 </button>
                 <div className="flex gap-4">
                     {[0, 1, 2].map(idx => (
@@ -339,7 +364,7 @@
                     ))}
                 </div>
                 <button disabled={currentPassageIdx === 2} onClick={() => setCurrentPassageIdx(prev => prev + 1)} className="text-slate-400 font-black text-[10px] uppercase flex items-center gap-3 hover:text-blue-600 transition-all tracking-widest disabled:opacity-20">
-                  Bài kế tiếp <ChevronRightIcon />
+                  Next <ChevronRightIcon />
                 </button>
               </footer>
             </div>
